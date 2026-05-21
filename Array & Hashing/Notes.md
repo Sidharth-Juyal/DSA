@@ -1,32 +1,29 @@
-# Dynamic Arrays in Python
+# Dynamic Arrays
 
-## What is a Dynamic Array?
+## Definition
 
-A Dynamic Array is an array that can grow or shrink automatically at runtime.
+A dynamic array resizes automatically when capacity is exceeded.
 
-Unlike static arrays, we do not need to define the size beforehand.
-
-Python's built-in `list` is implemented as a dynamic array internally.
+Python's `list` is a dynamic array internally.
 
 ---
 
-# Static Array vs Dynamic Array
+# Static vs Dynamic Arrays
 
 | Feature | Static Array | Dynamic Array |
 |---|---|---|
 | Size | Fixed | Resizable |
-| Memory Allocation | Done once | Reallocated when needed |
-| Insertion at End | O(1) | O(1) amortized |
-| Flexibility | Low | High |
+| Insert at End | O(1) | O(1) amortized |
+| Insert/Delete Middle | O(n) | O(n) |
 
 ---
 
-# Internal Working
+# Core Idea
 
-A dynamic array maintains:
+Dynamic arrays maintain:
 
-- `length` → Number of actual elements
-- `capacity` → Total allocated space
+- `length` → actual elements
+- `capacity` → allocated space
 
 Example:
 
@@ -35,26 +32,13 @@ length = 3
 capacity = 4
 ```
 
-This means:
-- 3 positions are filled
-- 1 position is empty
-
 ---
 
-# Dynamic Array Insertion
-
-When inserting an element:
-
-1. Check if array is full
-2. If full → resize the array
-3. Insert element at next empty index
-
----
-
-## Push Back Operation
+# Append Operation
 
 ```python
 def pushback(self, n):
+
     if self.length == self.capacity:
         self.resize()
 
@@ -66,25 +50,18 @@ def pushback(self, n):
 
 # Resize Operation
 
-When the array becomes full:
-
-- Create a new array with double capacity
-- Copy old elements
-- Replace old array
-
----
-
-## Resize Code
+When full:
+1. Create new array with double capacity
+2. Copy old elements
+3. Replace old array
 
 ```python
 def resize(self):
-    # Double the capacity
-    self.capacity = 2 * self.capacity
 
-    # Create new array
+    self.capacity *= 2
+
     newArr = [0] * self.capacity
 
-    # Copy elements
     for i in range(self.length):
         newArr[i] = self.arr[i]
 
@@ -93,637 +70,411 @@ def resize(self):
 
 ---
 
-# Why Double the Capacity?
+# Why Double Capacity?
 
-Capacity growth pattern:
+Growth pattern:
 
 ```text
 1 → 2 → 4 → 8 → 16
 ```
 
-Doubling ensures resizing happens less frequently.
+Doubling minimizes resizing frequency.
 
-If capacity increased by only `+1` every time:
+If capacity increased by only `+1` each time:
 
 ```text
-1 → 2 → 3 → 4 → 5 ...
+1 → 2 → 3 → 4 → 5
 ```
 
-Then resizing and copying would happen on almost every insertion, making insertion inefficient.
+Insertion would become inefficient due to repeated copying.
 
 ---
 
-# Amortized Time Complexity
+# Amortized O(1)
 
-A single resize operation takes:
+Single resize:
 
 ```text
 O(n)
 ```
 
-because all elements must be copied.
+But resizing happens rarely.
 
-But resizing does not happen on every insertion.
-
-Most insertions simply place the element at the end.
+Most appends are direct insertions.
 
 Therefore:
 
 ```text
-Average insertion time = O(1)
-```
-
-This is called:
-
-## Amortized O(1)
-
----
-
-# Understanding Amortized Analysis
-
-Suppose capacities grow like this:
-
-```text
-1 → 2 → 4 → 8
-```
-
-Total copy operations:
-
-```text
-1 + 2 + 4 + 8 = 15
-```
-
-To create an array of size `8`, only about `2n` operations are needed overall.
-
-General rule:
-
-```text
-Total operations ≤ 2n
-```
-
-Therefore:
-
-```text
-n insertions = O(n)
-```
-
-So:
-
-```text
-Single insertion = O(1) amortized
+Append = O(1) amortized
 ```
 
 ---
 
-# Important Big-O Note
+# Middle Insertions/Deletions
 
-In asymptotic analysis:
-
-```text
-O(2n) = O(n)
-```
-
-because constants are ignored.
-
-We care about growth rate, not exact numbers.
-
----
-
-# Insertion in the Middle
-
-Inserting in the middle requires shifting elements to the right.
-
-Example:
+Require shifting elements.
 
 ```text
-[1, 2, 4, 5]
-
-Insert 3 at index 2
-
-Result:
-[1, 2, 3, 4, 5]
-```
-
-Time complexity:
-
-```text
-O(n)
+Time Complexity = O(n)
 ```
 
 ---
 
-# Deletion in the Middle
+# Time Complexity
 
-Deleting from the middle requires shifting elements to the left.
+| Operation | Complexity |
+|---|---|
+| Access | O(1) |
+| Append | O(1)* |
+| Insert Middle | O(n) |
+| Delete Middle | O(n) |
+| Resize | O(n) |
 
-Example:
-
-```text
-[1, 2, 3, 4, 5]
-
-Delete 3
-
-Result:
-[1, 2, 4, 5]
-```
-
-Time complexity:
-
-```text
-O(n)
-```
-
----
-
-# Time Complexity Table
-
-| Operation | Time Complexity | Notes |
-|---|---|---|
-| Access | O(1) | Direct indexing |
-| Insert at End | O(1)* | Amortized |
-| Insert in Middle | O(n) | Shifting required |
-| Delete at End | O(1) | Simple removal |
-| Delete in Middle | O(n) | Shifting required |
-| Resize | O(n) | Copy all elements |
+`*` = amortized
 
 ---
 
 # Key Takeaways
 
 - Dynamic arrays resize automatically
-- Python lists are dynamic arrays internally
-- Resizing usually doubles capacity
-- Appending at end is amortized `O(1)`
-- Middle insertions/deletions are `O(n)`
-- Dynamic arrays trade extra memory for flexibility and speed
+- Python lists use dynamic arrays internally
+- Capacity usually doubles during resize
+- Append is amortized `O(1)`
+- Middle operations require shifting → `O(n)`
 
 ---
 
-# Python Built-in Dynamic Array Example
+# Hashing
 
-```python
-arr = []
+## Definition
 
-arr.append(1)
-arr.append(2)
-arr.append(3)
+Hashing maps a key to an index using a hash function.
 
-print(arr)
-```
-
-Output:
-
-```python
-[1, 2, 3]
-```
-
-# Hash Usage in Python
-
-## What is Hashing?
-
-Hashing is a technique used to store and retrieve data efficiently.
-
-Two common hash-based data structures are:
-
-- `HashSet`
-- `HashMap`
-
-In Python:
-
-| Data Structure | Python Equivalent |
-|---|---|
-| HashSet | `set` |
-| HashMap | `dict` |
-
-Hash-based data structures are extremely important in coding interviews because they provide very fast insertion, deletion, and lookup operations.
+Used in:
+- HashMap (`dict`)
+- HashSet (`set`)
 
 ---
 
 # Set vs Map
 
-## Set
+| Structure | Stores |
+|---|---|
+| Set | Unique keys |
+| Map | Key-value pairs |
 
-A set stores only unique keys.
+---
+
+# When to Use HashMaps
+
+Common signals:
+- frequency
+- count
+- duplicate
+- unique
+- lookup
+- grouping
+
+---
+
+# Why HashMaps Are Fast
+
+A hash function converts keys into array indices.
 
 Example:
-
-```python
-s = {"alice", "bob", "charlie"}
-```
-
-Properties:
-- No duplicates
-- Unordered
-- Fast lookup
-
----
-
-## Map
-
-A map stores key-value pairs.
-
-Example:
-
-```python
-studentMarks = {
-    "alice": 95,
-    "bob": 88
-}
-```
-
-Properties:
-- Keys are unique
-- Values can repeat
-- Fast lookup using keys
-
----
-
-# When Should You Think About HashMaps?
-
-HashMaps are usually useful when problems contain words like:
-
-- "unique"
-- "frequency"
-- "count"
-- "duplicate"
-- "lookup"
-- "grouping"
-
-These are basically giant flashing signs saying:
-> "Please use hashing instead of brute force and unnecessary suffering."
-
----
-
-# Motivation
-
-Let us compare different data structures.
-
-| Operation | TreeMap | HashMap | Array |
-|---|---|---|---|
-| Insert | O(log n) | O(1) average | O(n) |
-| Remove | O(log n) | O(1) average | O(n) |
-| Search | O(log n) | O(1) average | O(log n) if sorted |
-| Inorder Traversal | O(n) | Not possible | Not possible |
-
----
-
-# Why Are HashMaps Fast?
-
-HashMaps use a hash function internally.
-
-A hash function converts a key into an index/location in memory.
-
-Example idea:
 
 ```text
-"alice" → hash → memory index
+"Alice" → hash → index
 ```
 
-This allows direct access to data instead of searching element by element.
+This allows direct access.
 
-That is why average lookup time becomes:
+Average complexity:
 
 ```text
 O(1)
 ```
-
-Which is absurdly fast compared to linear search.
 
 ---
 
 # TreeMap vs HashMap
 
-## TreeMap
-
-Advantages:
-- Keys remain sorted
-- Inorder traversal possible
-- Range queries are efficient
-
-Disadvantages:
-- Slower operations (`O(log n)`)
+| Operation | TreeMap | HashMap |
+|---|---|---|
+| Insert | O(log n) | O(1) avg |
+| Remove | O(log n) | O(1) avg |
+| Search | O(log n) | O(1) avg |
+| Ordered Traversal | Yes | No |
 
 ---
 
-## HashMap
-
-Advantages:
-- Extremely fast insertion/search/deletion
-- Average `O(1)` operations
-
-Disadvantages:
-- No ordering
-- Cannot traverse keys in sorted order directly
-
-If sorted traversal is needed:
+# Frequency Counting
 
 ```python
-sorted(myMap.keys())
-```
+names = ["alice", "brad", "brad"]
 
-But sorting costs:
-
-```text
-O(n log n)
-```
-
----
-
-# Frequency Counting Using HashMap
-
-One of the most common uses of a hashmap is counting frequencies.
-
-Example array:
-
-```python
-names = ["alice", "brad", "collin", "brad", "dylan", "kim"]
-```
-
-Goal:
-
-```text
-alice  → 1
-brad   → 2
-collin → 1
-dylan  → 1
-kim    → 1
-```
-
----
-
-# Frequency Counting Code
-
-```python
-names = ["alice", "brad", "collin", "brad", "dylan", "kim"]
-
-countMap = {}
+freq = {}
 
 for name in names:
-
-    # If name does not exist
-    if name not in countMap:
-        countMap[name] = 1
-
-    # If name already exists
-    else:
-        countMap[name] += 1
-
-print(countMap)
+    freq[name] = freq.get(name, 0) + 1
 ```
 
 Output:
 
 ```python
 {
-    'alice': 1,
-    'brad': 2,
-    'collin': 1,
-    'dylan': 1,
-    'kim': 1
+    "alice": 1,
+    "brad": 2
 }
 ```
 
 ---
 
-# Cleaner Python Approach
-
-Python provides `.get()` for cleaner frequency counting.
-
-```python
-names = ["alice", "brad", "collin", "brad", "dylan", "kim"]
-
-countMap = {}
-
-for name in names:
-    countMap[name] = countMap.get(name, 0) + 1
-
-print(countMap)
-```
-
-Explanation:
-
-```python
-countMap.get(name, 0)
-```
-
-means:
-
-- return existing value if key exists
-- otherwise return `0`
-
-Very common interview pattern.
-
----
-
-# Why HashMaps Do Not Allow Duplicate Keys
-
-Example:
-
-```python
-m = {}
-
-m["alice"] = 1
-m["alice"] = 5
-```
-
-Final map:
-
-```python
-{"alice": 5}
-```
-
-The second value overwrites the first.
-
-This uniqueness property makes hashmaps useful for:
-- frequency counting
-- duplicate detection
-- caching
-- lookup tables
-
----
-
-# Time Complexity Analysis
-
-## Using TreeMap
-
-Each insertion:
-
-```text
-O(log n)
-```
-
-For `n` elements:
-
-```text
-O(n log n)
-```
-
----
-
-## Using HashMap
-
-Each insertion:
-
-```text
-O(1) average
-```
-
-For `n` elements:
-
-```text
-O(n)
-```
-
-This is why hashmaps are heavily preferred for frequency problems.
-
----
-
-# Space Complexity
-
-Space complexity:
-
-```text
-O(n)
-```
-
-where `n` is the number of unique keys.
-
-Example:
-
-```python
-["a", "a", "a", "a"]
-```
-
-Only one unique key exists.
-
-Space used:
-
-```text
-O(1)
-```
-
-But:
-
-```python
-["a", "b", "c", "d"]
-```
-
-All unique.
-
-Space used:
-
-```text
-O(n)
-```
-
----
-
-# Common HashMap Interview Patterns
-
-## 1. Frequency Counting
-
-```python
-freq[num] += 1
-```
-
----
-
-## 2. Duplicate Detection
+# Duplicate Detection
 
 ```python
 seen = set()
 
-for num in nums:
-    if num in seen:
+for n in nums:
+
+    if n in seen:
         return True
-    seen.add(num)
+
+    seen.add(n)
 ```
 
 ---
 
-## 3. Fast Lookup
+# Hash Collisions
 
-```python
-phoneBook = {
-    "alice": "9876543210"
-}
-
-print(phoneBook["alice"])
-```
-
----
-
-## 4. Grouping Data
+A collision occurs when multiple keys map to the same index.
 
 Example:
 
-```python
-{
-    "fruit": ["apple", "banana"],
-    "vegetable": ["carrot"]
-}
+```text
+"Alice" → index 1
+"Collin" → index 1
 ```
+
+Collisions are unavoidable.
+
+---
+
+# Collision Handling
+
+## 1. Chaining
+
+Store multiple values at same index using linked lists.
+
+```text
+Index 1:
+Alice → Collin
+```
+
+---
+
+## 2. Open Addressing
+
+Search for next available slot.
+
+```text
+Index 1 occupied
+Try index 2
+Try index 3
+```
+
+---
+
+# Rehashing
+
+When hashmap becomes crowded:
+
+1. Create larger array
+2. Recompute all indices
+3. Reinsert elements
+
+Usually:
+
+```python
+capacity *= 2
+```
+
+---
+
+# HashMap Complexity
+
+| Operation | Average |
+|---|---|
+| Insert | O(1) |
+| Remove | O(1) |
+| Search | O(1) |
+
+Worst case:
+
+```text
+O(n)
+```
+
+if collisions become excessive.
 
 ---
 
 # Key Takeaways
 
-- HashMaps store key-value pairs
-- HashSets store only unique keys
-- HashMaps provide average `O(1)` operations
-- HashMaps are ideal for:
-  - counting
-  - frequency problems
-  - duplicates
-  - lookups
-- TreeMaps maintain sorted order
-- HashMaps sacrifice ordering for speed
+- HashMaps use arrays internally
+- Hash functions convert keys to indices
+- Collisions are inevitable
+- Chaining and open addressing resolve collisions
+- Python `dict` and `set` use hashing internally
 
 ---
 
-# Python Built-in Hash Structures
+# Prefix Sums
 
-## HashSet
+## Definition
 
-```python
-s = set()
+Prefix sum stores cumulative sums.
 
-s.add(1)
-s.add(2)
-s.add(2)
-
-print(s)
-```
-
-Output:
+Example:
 
 ```python
-{1, 2}
+nums = [2, -1, 3, -3, 4]
 ```
 
-Duplicates are ignored.
+Prefix array:
+
+```python
+[2, 1, 4, 1, 5]
+```
 
 ---
 
-## HashMap
+# Building Prefix Sum
 
 ```python
-m = {}
+class PrefixSum:
 
-m["name"] = "Sid"
-m["age"] = 25
+    def __init__(self, nums):
 
-print(m)
+        self.prefix = []
+
+        total = 0
+
+        for n in nums:
+            total += n
+            self.prefix.append(total)
 ```
 
-Output:
+---
+
+# Range Sum Query
+
+Formula:
+
+```text
+prefix[right] - prefix[left - 1]
+```
+
+Edge case:
 
 ```python
-{
-    "name": "Sid",
-    "age": 25
-}
+left == 0
 ```
 
-Python dictionaries are highly optimized hashmaps internally. Entire modern software systems are basically held together by hash tables and caffeine.
-````
+then:
+
+```text
+prefix[left - 1] = 0
+```
+
+---
+
+# Range Sum Code
+
+```python
+def rangeSum(self, left, right):
+
+    preRight = self.prefix[right]
+
+    preLeft = self.prefix[left - 1] if left > 0 else 0
+
+    return preRight - preLeft
+```
+
+---
+
+# Example
+
+```python
+nums = [2, -1, 3, -3, 4]
+prefix = [2, 1, 4, 1, 5]
+```
+
+Query:
+
+```python
+left = 2
+right = 3
+```
+
+Calculation:
+
+```text
+prefix[3] - prefix[1]
+1 - 1
+= 0
+```
+
+Subarray:
+
+```python
+[3, -3]
+```
+
+---
+
+# Time Complexity
+
+| Operation | Complexity |
+|---|---|
+| Build Prefix Sum | O(n) |
+| Range Query | O(1) |
+
+---
+
+# Space Complexity
+
+| Approach | Complexity |
+|---|---|
+| Separate Prefix Array | O(n) |
+| In-place Prefix Sum | O(1) extra |
+
+---
+
+# Prefix Variants
+
+Other prefix operations:
+- Prefix product
+- Prefix XOR
+- Prefix min/max
+
+Postfix sums work from right → left.
+
+---
+
+# Common Prefix Sum Problems
+
+- Range sum queries
+- Subarray sum equals K
+- Running totals
+- Equilibrium index
+
+---
+
+# Key Takeaways
+
+- Prefix sums preprocess cumulative values
+- Range sum queries become `O(1)`
+- Build time is `O(n)`
+- Useful for repeated subarray calculations
+- Common interview optimization technique
